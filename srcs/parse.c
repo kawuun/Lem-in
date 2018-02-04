@@ -50,6 +50,11 @@ void    parse_link(t_lem *data, char *s)
     i = -1;
     while (s[++i] ^ '-')
         ;
+	if (!s[i + 1])
+	{
+		write(1, "ERROR\n", 6);
+		exit(EXIT_FAILURE);
+	}
     r1 = ft_strsub(s, 0, i);
     r2 = ft_strsub(s, i + 1, ft_strlen(s) - (i + 1));
     add_link(data->rooms, r1, r2);
@@ -69,10 +74,20 @@ void    parse_room(t_lem *data, int *f, char *s)
     {
         while (s[++i] && s[i] ^ ' ')
             ;
+		if (!s[i])
+		{
+			write(1, "ERROR\n", 6);
+			exit(EXIT_FAILURE);
+		}
         new = (t_room*)malloc(sizeof(t_room));
         new->name = NULL;
         new->name = ft_strsub(s, 0, i);
         new->x = 0;
+		if (!ft_isdigit(s[i + 1]))
+		{
+			write(1, "ERROR\n", 6);
+			exit(EXIT_FAILURE);
+		}
         while (ft_isdigit(s[++i]))
             new->x = new->x * 10 + s[i] - '0';
         new->y = ft_atoi(s + i);
@@ -101,12 +116,15 @@ int    parse_input(t_lem *data)
     flag = 0;
     line = NULL;
     get_next_line(0, &line);
+	if ((!ft_isdigit(line[0]) && line[0] != '+') || line[0] == '+' && !ft_isdigit(line[1]))
+	{
+		write(1, "ERROR\n", 6);
+		exit(EXIT_FAILURE);
+	}
     data->ants = ft_atoi(line);
     tab[a++] = line;
     while (get_next_line(0, &line) > 0)
     {
-        if (a == 2047)
-            exit(1);
         if (line && line[0] && line[1] && !(line[0] ^ '#') && line[1] ^ '#')
             continue;
         else if (!ft_strcmp(line, "##start"))
@@ -129,29 +147,4 @@ int    parse_input(t_lem *data)
         return (1);
     }
     return (0);
-    // return (0);
-
-    // tester_parser
-    // t_list *lol;
-    // t_list *l;
-    // lol = data->rooms;
-    // t_room *test;
-    // int *tmp;
-    // while (lol)
-    // {
-    //     test = lol->content;
-    //     ft_printf("Testing.....[%s]\n", test->name);
-    //     ft_printf("ID-[%d]\n", test->id);
-    //     ft_printf("LINKS:\n");
-    //     l = test->lnk;
-    //     a = 0;
-    //     while (l)
-    //     {
-    //         tmp = l->content;
-    //         ft_printf("lnk %d: [%d]\n", a++, *tmp);
-    //         l = l->next;
-    //     }
-    //     lol = lol->next;
-    // }
-
 }
